@@ -46,3 +46,24 @@ def test_division_symbol():
     data = r.json()
     assert data["ok"] is True
     assert abs(data["result"] - 7.5) < 1e-9
+
+def test_basic_addition():
+    r = client.post("/calculate", params={"expr": "30+4"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["ok"] is True
+    assert abs(data["result"] - 34) < 1e-9
+
+def test_basic_subtraction():
+    r = client.post("/calculate", params={"expr": "22-50"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["ok"] is True
+    assert abs(data["result"] - (-28)) < 1e-9
+
+def test_multiple_percent():
+    r = client.post("/calculate", params={"expr": "6%%"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["ok"] is True
+    assert abs(data["result"] - 0.0006) < 1e-9
