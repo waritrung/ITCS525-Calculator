@@ -29,6 +29,7 @@ def test_two_standalone_percents():
     """Test expression with two standalone percentages."""
     assert expand_percent("10% + 20%") == "(10/100) + (20/100)"
 
+"""Add more tests"""
 def test_multiple_100_percent():
     """Test standalone percentage (100%%%)."""
     assert expand_percent("100%%%") == "(((100/100)/100)/100)"

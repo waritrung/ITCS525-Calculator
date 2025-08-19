@@ -1,0 +1,17 @@
+I found Error In expand_percent, the function cannot process value have multiple percent(%)
+
+For example: 50%% should be => ((50/100)/100)
+
+I also add test cases in test_calculator.py file
+    - test_multiple_100_percent
+    - test_two_multiple_percents
+
+For test_main.py I add test case as instruction the test case are
+    - test_multiplication_symbol
+    - test_division_symbol
+    - test_basic_addition
+    - test_basic_subtraction
+    - test_multiple_percent
+
+But I found bug that I cannot fix in calculator when I click a single percent icon it got double percent
+    I record in Calculator-client_bug.mov

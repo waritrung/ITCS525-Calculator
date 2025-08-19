@@ -22,7 +22,7 @@ app.add_middleware(
 # ---------- Safe evaluator ----------
 aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})
 
-
+"""POST Calculate Route"""
 @app.post("/calculate")
 def calculate(expr: str):
     try:
@@ -38,7 +38,7 @@ def calculate(expr: str):
             aeval.error.clear()
             return {"ok": False, "expr": expr, "result": "", "error": msg}
         
-        # TODO: Add history 
+        """Add history """
         historyInfo = {
             "timestamp": now, 
             "expr": expr, 
@@ -50,13 +50,13 @@ def calculate(expr: str):
     except Exception as e:
         return {"ok": False, "expr": expr, "error": str(e)}
 
-# TODO GET /hisory
+"""GET hisory"""
 @app.get("/history")
 def get_History(limit: int):
 
         return history
 
-# TODO DELETE /history
+"""DELETE history"""
 @app.delete("/history")
 def clear_History():
     history.clear()
