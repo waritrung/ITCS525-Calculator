@@ -26,7 +26,6 @@ aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})
 @app.post("/calculate")
 def calculate(expr: str):
     try:
-        now = datetime.now()
         
         expr = expr.replace("×", "*")
         expr = expr.replace("÷", "/")
@@ -39,22 +38,21 @@ def calculate(expr: str):
             return {"ok": False, "expr": expr, "result": "", "error": msg}
         
         """Add history """
-        historyInfo = {
-            "timestamp": now, 
-            "expr": expr, 
-            "result": result}
+        history.appendleft({
+            "timestamp": datetime.now().isoformat() + "Z",
+            "expr": expr,
+            "result": result,
+        })
         
-        history.append(historyInfo)
-
         return {"ok": True, "expr": expr, "result": result, "error": ""}
     except Exception as e:
         return {"ok": False, "expr": expr, "error": str(e)}
 
 """GET hisory"""
 @app.get("/history")
-def get_History(limit: int):
+def get_history(limit: int = 50):
+    return list(history)[: max(0, min(limit, HISTORY_MAX))]
 
-        return history
 
 """DELETE history"""
 @app.delete("/history")
