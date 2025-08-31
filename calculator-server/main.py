@@ -4,8 +4,8 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from asteval import Interpreter
-
 from calculator import expand_percent
+import models
 
 HISTORY_MAX = 1000
 history = deque(maxlen=HISTORY_MAX)
@@ -24,10 +24,10 @@ aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})
 
 """POST Calculate Route"""
 @app.post("/calculate")
-def calculate(expr: str):
+def calculate(input: models.Expression):
     try:
         
-        expr = expr.replace("×", "*")
+        expr = input.expr.replace("×", "*")
         expr = expr.replace("÷", "/")
 
         code = expand_percent(expr)
@@ -50,9 +50,18 @@ def calculate(expr: str):
 
 """GET hisory"""
 @app.get("/history")
-def get_history(limit: int = 50):
-    return list(history)[: max(0, min(limit, HISTORY_MAX))]
-
+def get_history(limit: int = 50) -> list[models.CalculatorLog]:
+    logs = []
+    for entry in list(history)[: max(0, min(limit, HISTORY_MAX))]:
+        print(entry)
+        logs.append(models.CalculatorLog(
+            ok=True,
+            timestamp=entry["timestamp"],
+            expr=entry["expr"],
+            error="",
+            result=entry["result"]
+        ))
+    return logs
 
 """DELETE history"""
 @app.delete("/history")
