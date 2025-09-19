@@ -1,4 +1,13 @@
+from collections import deque
+from typing import Deque
+import schemas
 import re
+
+HISTORY_MAX = 1000
+_history = deque(maxlen=HISTORY_MAX)
+
+def get_history() -> Deque:
+    return _history
 
 _percent_pair = re.compile(r"""
     (?P<a>\d+(?:\.\d+)?)
@@ -7,11 +16,11 @@ _percent_pair = re.compile(r"""
 """, re.VERBOSE)
 _number_percent = re.compile(r"(?P<n>\d+(?:\.\d+)?)(?P<p>%+)")
 
-
-def expand_percent(expr: str) -> str:
-    """Expand percent expressions including multiple % signs."""
-    s = expr
-
+async def expand_percent(input: schemas.ExpressionIn):
+    
+    original_expr = input.expr
+    s = original_expr.replace("×", "*").replace("÷", "/")
+    
     # Expand A op B%% patterns
     while True:
         m = _percent_pair.search(s)
@@ -45,4 +54,5 @@ def expand_percent(expr: str) -> str:
         return expr
 
     s = _number_percent.sub(percent_replacer, s)
-    return s
+    
+    return {"original": original_expr, "expanded": s}

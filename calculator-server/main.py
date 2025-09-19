@@ -1,16 +1,10 @@
-import math
-from collections import deque
-from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from asteval import Interpreter
-from calculator import expand_percent
-import models
-
-HISTORY_MAX = 1000
-history = deque(maxlen=HISTORY_MAX)
+from routers import calculator,history
 
 app = FastAPI(title="Mini Calculator API")
+app.include_router(calculator.router)
+app.include_router(history.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,41 +13,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------- Safe evaluator ----------
-aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})
 
-"""POST Calculate Route"""
-@app.post("/calculate")
-def calculate(input: models.Expression):
-    try:
+# # ---------- Safe evaluator ----------
+# aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})
+
+# """POST Calculate Route"""
+# @app.post("/calculate")
+# def calculate(
+#     input: Annotated[schemas.ExpressionIn, Depends(expand_percent)],
+#     history: Annotated[Deque, Depends(get_history)]
+#     ):
+#     try:
         
-        expr = input.expr.replace("×", "*")
-        expr = expr.replace("÷", "/")
-
-        code = expand_percent(expr)
-        result = aeval(code)
-        if aeval.error:
-            msg = "; ".join(str(e.get_error()) for e in aeval.error)
-            aeval.error.clear()
-            return {"ok": False, "expr": expr, "result": "", "error": msg}
+#         result = aeval(input.expr)
+#         if aeval.error:
+#             msg = "; ".join(str(e.get_error()) for e in aeval.error)
+#             aeval.error.clear()
+#             return {"ok": False, "expr": input.expr, "result": "", "error": msg}
         
-        """Add history """
-        history.appendleft(models.CalculatorLog(
-            timestamp=datetime.now().isoformat() + "Z",
-            expr=expr,
-            result=result))
+#         """Add history """
+#         history.appendleft(schemas.ExpressionOut(
+#             timestamp=datetime.now().isoformat() + "Z",
+#             expr=input.expr,
+#             result=result))
         
-        return {"ok": True, "expr": expr, "result": result, "error": ""}
-    except Exception as e:
-        return {"ok": False, "expr": expr, "error": str(e)}
+#         return {"ok": True, "expr": input.expr, "result": result, "error": ""}
+#     except Exception as e:
+#         return {"ok": False, "expr": input.expr, "error": str(e)}
 
-"""GET hisory"""
-@app.get("/history")
-def get_history(limit: int = 50) -> list[models.CalculatorLog]:
-    return list(history)[: max(0, min(limit, HISTORY_MAX))]
+# """GET hisory"""
+# @app.get("/history")
+# def get(
+#     history: Annotated[Deque, Depends(get_history)],limit: int = 50) -> list[schemas.ExpressionOut]:
+#     return list(history)[: max(0, min(limit, HISTORY_MAX))]
 
-"""DELETE history"""
-@app.delete("/history")
-def clear_History():
-    history.clear()
-    return {"ok": True, "cleared": True}
+# """DELETE history"""
+# @app.delete("/history")
+# def clear(
+#     history: Annotated[Deque, Depends(get_history)]
+# ):
+#     history.clear()
+#     return {"ok": True, "cleared": True}

@@ -1,12 +1,14 @@
 from datetime import datetime
 from pydantic import BaseModel, PositiveInt
 
-class Expression(BaseModel):
+class BaseExpression(BaseModel):
     expr: str
     
-class CalculatorLog(BaseModel):
+class ExpressionIn(BaseExpression):
+    pass
+    
+class ExpressionOut(BaseExpression):
     ok: bool = True
     timestamp: str
-    expr: str
     error: str = ""
     result: float = None
