@@ -5,8 +5,8 @@ class Expression(BaseModel):
     expr: str
     
 class CalculatorLog(BaseModel):
-    ok: bool
+    ok: bool = True
     timestamp: str
     expr: str
-    error: str
+    error: str = ""
     result: float = None

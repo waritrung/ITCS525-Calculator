@@ -38,11 +38,10 @@ def calculate(input: models.Expression):
             return {"ok": False, "expr": expr, "result": "", "error": msg}
         
         """Add history """
-        history.appendleft({
-            "timestamp": datetime.now().isoformat() + "Z",
-            "expr": expr,
-            "result": result,
-        })
+        history.appendleft(models.CalculatorLog(
+            timestamp=datetime.now().isoformat() + "Z",
+            expr=expr,
+            result=result))
         
         return {"ok": True, "expr": expr, "result": result, "error": ""}
     except Exception as e:
@@ -51,17 +50,7 @@ def calculate(input: models.Expression):
 """GET hisory"""
 @app.get("/history")
 def get_history(limit: int = 50) -> list[models.CalculatorLog]:
-    logs = []
-    for entry in list(history)[: max(0, min(limit, HISTORY_MAX))]:
-        print(entry)
-        logs.append(models.CalculatorLog(
-            ok=True,
-            timestamp=entry["timestamp"],
-            expr=entry["expr"],
-            error="",
-            result=entry["result"]
-        ))
-    return logs
+    return list(history)[: max(0, min(limit, HISTORY_MAX))]
 
 """DELETE history"""
 @app.delete("/history")
