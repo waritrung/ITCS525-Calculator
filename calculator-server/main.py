@@ -1,8 +1,23 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from routers import calculator,history
+from database import engine, get_session
+from sqlmodel import SQLModel, select
+from contextlib import asynccontextmanager
+from models import User
 
-app = FastAPI(title="Mini Calculator API")
+
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code
+    SQLModel.metadata.create_all(engine)
+    yield
+    # Shutdown code
+
+app = FastAPI(title="Mini Calculator API", lifespan=lifespan)
+
 app.include_router(calculator.router)
 app.include_router(history.router)
 
@@ -13,6 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/users")
+def read_users(session = Depends(get_session)):
+    users = session.exec(select(User)).all()
+    return users
 
 # # ---------- Safe evaluator ----------
 # aeval = Interpreter(minimal=True, usersyms={"pi": math.pi, "e": math.e})

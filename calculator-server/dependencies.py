@@ -16,7 +16,7 @@ _percent_pair = re.compile(r"""
 """, re.VERBOSE)
 _number_percent = re.compile(r"(?P<n>\d+(?:\.\d+)?)(?P<p>%+)")
 
-async def expand_percent(input: schemas.ExpressionIn):
+async def expand_percent(input: schemas.Expression):
     
     original_expr = input.expr
     s = original_expr.replace("×", "*").replace("÷", "/")
