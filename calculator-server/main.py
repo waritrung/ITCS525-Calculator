@@ -6,9 +6,6 @@ from sqlmodel import SQLModel, select
 from contextlib import asynccontextmanager
 from models import User
 
-
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup code
